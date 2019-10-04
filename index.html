@@ -1,0 +1,144 @@
+<html>
+<head>
+    <title>tlk</title>
+    <script src="/socket.io/socket.io.js"></script>
+    <script src="http://code.jquery.com/jquery-latest.min.js"></script>
+    <style>
+        body {
+            background:#0d0f31;
+            color:white;
+            margin:0;
+            padding:0;
+        }
+
+        .container {
+            width:1000px;
+            margin:0 auto;
+        }
+
+        .left-menu {
+            width:200px;
+            height:100%;
+            background:#070825;
+            text-align:center;
+           float:left;
+        }
+
+        .chat-body {
+            width:800px;
+            height:auto;
+            
+            float:left;
+        }
+
+        .chatbox {
+            background:#1b1e5c;
+            color:white;
+            border-radius:10px;
+            padding:10px;
+            margin:10px;
+        }
+
+        .footer {
+            position: fixed;
+            left: 0;
+            bottom: 0;
+            width: 100%;
+            background-color:#070825;
+            color: white;
+          }
+
+          .footerform {
+              margin-left:200px;
+          }
+
+          .footer textarea {
+              background:#1b1e5c;
+              border:0;
+              width:90%;
+              border-radius:10px;
+              margin:10px 0;
+              height:50px;
+          }
+
+            .footer #message {
+                color:white;
+            }
+
+          .footer input {
+              background:#ff16b0;
+              border:0;
+              width:7%;
+              border-radius:10px;
+              padding:15px;
+              
+          }
+
+
+    </style>
+</head>
+<body>
+        <div class="left-menu">
+            <h3>Online Users</h3>
+            <ul class="list-group" id="users"></ul>
+            <form id="userForm">
+                <input id="username"></textarea>
+                <input type="submit" value = "Login" />
+            </form>
+        </div><!-- .left-menu -->
+        <div class="chat-body" id="chat">
+           
+        </div><!-- .chat-body -->
+
+        <div class="footer">
+            <div class="footerform">
+            <form id="messageForm">
+                <textarea class="form-control" id="message"></textarea>
+                <input type="submit" value="Send Message" />
+              </form>
+            </div><!-- .footerform --> 
+        </div><!-- .footer -->
+ 
+
+
+    <script>
+        $(function(){
+            var socket = io.connect();
+            var $messageForm = $('#messageForm');
+            var $message = $('#message');
+            var $chat = $('#chat');
+            var $messageArea = $('#messageArea');
+            var $userFormArea = $('#userFormArea');
+            var $userForm = $('#userForm');
+            var $users = $('#users');
+            var $username = $('#username');
+
+            $messageForm.submit(function(e){
+                e.preventDefault();
+                socket.emit('send message', $message.val());
+                $message.val('');
+              });
+
+              $userForm.submit(function(e){
+                e.preventDefault();
+                socket.emit('new user', $username.val());
+                $username.val('');
+              });  
+
+            socket.on('new message', function(data){
+                $chat.append('<div class="chatbox">'+data.msg+'</div>');
+            })
+
+            socket.on('get users', function (){
+                var html = '';
+                for (i = 0;i < data.length;i++){
+                    html += '<li class="list-group-item">'+data[i]+'</li>'
+                }
+                $users.html(html);
+            });
+
+        });         
+    </script>
+
+</body>
+</html>
